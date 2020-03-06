@@ -14,7 +14,7 @@
 
 @implementation Solution
 // Complete the substrCount function below.
-- (NSNumber *) substrCount:(NSNumber *)n
+- (NSNumber *) substrCount_bad:(NSNumber *)n
                          s:(NSString *)s
 {
     if(n == nil || s == nil || s.length != n.unsignedIntegerValue || n.unsignedIntegerValue == 0 || n.unsignedIntegerValue > 1000000)
@@ -78,14 +78,73 @@
     return @(counterSpecialString);
 }
 
+- (NSNumber *) substrCount:(NSNumber *)n
+                         s:(NSString *)s
+{
+    if(n == nil || s == nil || s.length != n.unsignedIntegerValue || n.unsignedIntegerValue == 0 || n.unsignedIntegerValue > 1000000)
+    {
+        assert(false); return nil;
+    }
+    
+    NSMutableArray <NSString*> *sList = [NSMutableArray array];
+    for (int i = 0; i <  s.length; i++)
+    {
+        [sList addObject:[s substringWithRange:NSMakeRange(i, 1)]];
+    }
+    NSUInteger numberSymbols        = s.length;
+    NSUInteger counterSpecialString = 0;
+    NSUInteger c, j,              i = 0;
+    
+    NSUInteger same_char_count[numberSymbols];
+    for (NSUInteger i = 0; i < numberSymbols ; i++)
+    {
+        same_char_count[i] = 0;
+    }
+
+    while(i < numberSymbols)
+    {
+        j = i + 1;
+        c = 1;
+        
+        while( (j < numberSymbols) && [sList[i] isEqualToString:sList[j]])
+        {
+            j++;
+            c++;
+        }
+
+        //total substrings which have all same char(s)
+        counterSpecialString = counterSpecialString + (c*(c+1))/2;
+        same_char_count[i]   = c;
+        i = j;
+    }
+
+    for( j = 1; j < numberSymbols - 1; j++)
+    {
+        if([sList[j] isEqualToString: sList[j-1]])
+        {
+            same_char_count[j] = same_char_count[j-1];
+        }
+
+        //odd length substr(s) which has middle element diiferent
+        if([sList[j-1] isEqualToString:sList[j+1]] && ([sList[j] isEqualToString:sList[j-1]] == NO))
+        {
+            counterSpecialString += MIN(same_char_count[j-1], same_char_count[j+1]);
+        }
+    }
+    
+    return @(counterSpecialString);
+}
+
+
+
 @end
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
-        NSNumber *result = [[[Solution alloc] init] substrCount:@(4)
-                                                              s:@"aaaa"];
+        NSNumber *result = [[[Solution alloc] init] substrCount:@(5)
+                                                           //   s:@"aaaa"];
                                                            // s:@"abcbaba"];
-                                                           // s:@"asasd"];
+                                                            s:@"asasd"];
         NSLog(@"result: %@\n\n", result);
     }
     return 0;
